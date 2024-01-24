@@ -1,5 +1,4 @@
 **/node_modules
-dist
 sandbox/src/DragAndDock
 src/.DS_Store
 .DS_Store

@@ -13,8 +13,8 @@ function Panel(props) {
   const {
     children,
     context,
-    draggingWidth,
-    draggingHeight,
+    width,
+    height,
     defaultHeight,
     defaultPosition,
     defaultWidth,
@@ -128,8 +128,8 @@ function Panel(props) {
   const style = {
     ...rootStyle,
     display: !panel || panel.isVisible ? 'block' : 'none',
-    height: (isDragging && draggingHeight)  || get(panel, 'dimensions.height') || defaultHeight,
-    width: (isDragging && draggingWidth) || get(panel, 'dimensions.width') || defaultWidth,
+    height: (isDragging && height) || get(panel, 'dimensions.height') || defaultHeight,
+    width: (isDragging && width) || get(panel, 'dimensions.width') || defaultWidth,
     position: 'absolute',
     left: 0,
     top: 0,
@@ -185,6 +185,8 @@ Panel.propTypes = {
     y: PropTypes.number.isRequired,
   }),
   defaultWidth: PropTypes.number,
+  height: PropTypes.number,
+  width: PropTypes.number,
   initialDockUid: PropTypes.string,
   renderTitleBar: PropTypes.func,
   styles: PropTypes.shape({
@@ -196,12 +198,15 @@ Panel.propTypes = {
 };
 
 Panel.defaultProps = {
+  height: null,
+  width: null,
   defaultHeight: null,
   defaultWidth: null,
   defaultPosition: undefined,
   initialDockUid: null,
   renderTitleBar: null,
   styles: {},
+  classes: {},
   title: 'Panel',
   uid: null,
 };
