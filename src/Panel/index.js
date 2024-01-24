@@ -7,23 +7,28 @@ import Draggable from 'react-draggable';
 import { checkMouseEventIntersectsElement } from './utils';
 import withContext from '../withContext';
 import { Handle, Root } from './styles';
+import clsx from 'clsx';
 
 function Panel(props) {
   const {
     children,
     context,
+    draggingWidth,
+    draggingHeight,
     defaultHeight,
     defaultPosition,
     defaultWidth,
     initialDockUid,
     renderTitleBar,
     styles,
+    classes,
     title,
     uid: propsUid,
   } = props;
 
   const ref = useRef(null);
   const uidRef = useRef(propsUid);
+  const [isDragging, setIsDragging] = useState(false);
   const [draggedOverDock, setDraggedOverDock] = useState(null);
   let uid = uidRef.current;
 
@@ -82,6 +87,7 @@ function Panel(props) {
     const dockUid = null;
 
     snapPanelToDock(uid, dockUid);
+    setIsDragging(true)
   };
 
   const handleDragStop = () => {
@@ -89,6 +95,7 @@ function Panel(props) {
     const dockUid = get(draggedOverDock, 'uid') || null;
 
     snapPanelToDock(uid, dockUid);
+    setIsDragging(draggedOverDock === null)
   };
 
   const handleMouseDown = () => {
@@ -107,6 +114,7 @@ function Panel(props) {
 
   const handleStyle = styles.handle || {};
   const rootStyle = styles.root || {};
+  const rootClasses = classes ? classes.root || {} : {};
 
   const position = (() => {
     if (!panel || !panel.snappedDockUid) return null;
@@ -120,8 +128,8 @@ function Panel(props) {
   const style = {
     ...rootStyle,
     display: !panel || panel.isVisible ? 'block' : 'none',
-    height: get(panel, 'dimensions.height') || defaultHeight,
-    width: get(panel, 'dimensions.width') || defaultWidth,
+    height: (isDragging && draggingHeight)  || get(panel, 'dimensions.height') || defaultHeight,
+    width: (isDragging && draggingWidth) || get(panel, 'dimensions.width') || defaultWidth,
     position: 'absolute',
     left: 0,
     top: 0,
@@ -140,7 +148,7 @@ function Panel(props) {
       onStart={handleDragStart}
       onStop={handleDragStop}
     >
-      <Root ref={ref} style={style}>
+      <Root ref={ref} style={style} className={clsx('', rootClasses)}>
         {renderTitleBar &&
           renderTitleBar({
             draggableClassName,

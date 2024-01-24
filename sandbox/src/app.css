@@ -5,3 +5,19 @@ body {
   /* margin-top: 2em; */
   margin: 0;
 }
+
+.bg-white {
+  background: white;
+}
+
+.bg-red {
+  background: red;
+}
+
+.bg-yellow {
+  background: yellow;
+}
+
+.bg-blue {
+  background: blue;
+}
