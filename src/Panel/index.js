@@ -2,7 +2,7 @@ import React, { useLayoutEffect, useRef, useState } from 'react';
 import get from 'lodash/get';
 import PropTypes from 'prop-types';
 import ReactDOM from 'react-dom';
-import Draggable from 'react-draggable';
+import Draggable, { DraggableData, DraggableEvent } from 'react-draggable';
 
 import { checkMouseEventIntersectsElement } from './utils';
 import withContext from '../withContext';
@@ -24,6 +24,10 @@ function Panel(props) {
     classes,
     title,
     uid: propsUid,
+    onDragStart,
+    onDragMove,
+    onDragEnd,
+    onMouseDown
   } = props;
 
   const ref = useRef(null);
@@ -76,32 +80,36 @@ function Panel(props) {
     return panel;
   };
 
-  const handleDrag = (e) => {
+  const handleDrag = (e, data) => {
     const newDraggedOverDock = getDraggedOverDock(e);
 
     setDraggedOverDock(newDraggedOverDock);
+    onDragMove && onDragMove(e, data)
   };
 
-  const handleDragStart = () => {
+  const handleDragStart = (e, data) => {
     const { snapPanelToDock } = context;
     const dockUid = null;
 
     snapPanelToDock(uid, dockUid);
     setIsDragging(true)
+    onDragStart && onDragStart(e, data)
   };
 
-  const handleDragStop = () => {
+  const handleDragStop = (e, data) => {
     const { snapPanelToDock } = context;
     const dockUid = get(draggedOverDock, 'uid') || null;
 
     snapPanelToDock(uid, dockUid);
     setIsDragging(draggedOverDock === null)
+    onDragEnd && onDragEnd(e, data)
   };
 
-  const handleMouseDown = () => {
+  const handleMouseDown = (e) => {
     const { movePanelToTopOfStack } = context;
 
     movePanelToTopOfStack(uid);
+    onMouseDown && onMouseDown(e)
   };
 
   const portalTargetRef = context.panelsContainerRef;
@@ -195,6 +203,10 @@ Panel.propTypes = {
   }),
   title: PropTypes.string,
   uid: PropTypes.string,
+  onDragStart: PropTypes.func,
+  onDragMove: PropTypes.func,
+  onDragEnd: PropTypes.func,
+  onMouseDown: PropTypes.func,
 };
 
 Panel.defaultProps = {
@@ -209,6 +221,10 @@ Panel.defaultProps = {
   classes: {},
   title: 'Panel',
   uid: null,
+  onDragStart: null,
+  onDragMove: null,
+  onDragEnd: null,
+  onMouseDown: null,
 };
 
 export default withContext(Panel);
