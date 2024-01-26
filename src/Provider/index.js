@@ -183,6 +183,8 @@ class Provider extends Component {
       docks: this.docks,
       panels: this.panels,
     });
+
+    return this.state;
   };
 
   movePanelToTopOfStack = (panelUid) => {

@@ -2,7 +2,7 @@ import React, { useLayoutEffect, useRef, useState } from 'react';
 import get from 'lodash/get';
 import PropTypes from 'prop-types';
 import ReactDOM from 'react-dom';
-import Draggable, { DraggableData, DraggableEvent } from 'react-draggable';
+import Draggable from 'react-draggable';
 
 import { checkMouseEventIntersectsElement } from './utils';
 import withContext from '../withContext';
@@ -24,6 +24,8 @@ function Panel(props) {
     classes,
     title,
     uid: propsUid,
+    onDock,
+    onUnDock,
     onDragStart,
     onDragMove,
     onDragEnd,
@@ -90,8 +92,12 @@ function Panel(props) {
   const handleDragStart = (e, data) => {
     const { snapPanelToDock } = context;
     const dockUid = null;
-
-    snapPanelToDock(uid, dockUid);
+    const state = snapPanelToDock(uid, dockUid);
+    if (draggedOverDock) {
+      const uid = draggedOverDock.uid
+      const dock = state.docks.get(uid);
+      onUnDock && onUnDock(dock.uid)
+    }
     setIsDragging(true)
     onDragStart && onDragStart(e, data)
   };
@@ -100,7 +106,11 @@ function Panel(props) {
     const { snapPanelToDock } = context;
     const dockUid = get(draggedOverDock, 'uid') || null;
 
-    snapPanelToDock(uid, dockUid);
+    const state = snapPanelToDock(uid, dockUid);
+    if (draggedOverDock) {
+      const dock = state.docks.get(dockUid)
+      onDock && onDock(dock.uid)
+    }
     setIsDragging(draggedOverDock === null)
     onDragEnd && onDragEnd(e, data)
   };
@@ -203,6 +213,8 @@ Panel.propTypes = {
   }),
   title: PropTypes.string,
   uid: PropTypes.string,
+  onDock: PropTypes.func,
+  onUnDock: PropTypes.func,
   onDragStart: PropTypes.func,
   onDragMove: PropTypes.func,
   onDragEnd: PropTypes.func,
@@ -221,6 +233,8 @@ Panel.defaultProps = {
   classes: {},
   title: 'Panel',
   uid: null,
+  onDock: null,
+  onUnDock: null,
   onDragStart: null,
   onDragMove: null,
   onDragEnd: null,
